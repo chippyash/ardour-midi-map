@@ -43,3 +43,12 @@ Uncommented text at L91 & L92
 
 Ardour V 5.
 
+akai-mpd-32.map
+Description: Validating Binding/@channel: Value "17" contravenes the maxInclusive facet "16" of the type channelNumber
+Start location: 45:55
+Occurs multiple times in this file where channel > 16
+
+AKAI_MPKmini.map
+Description: Attribute @motorised is not allowed on element <DeviceInfo>
+Start location: 12:44
+
