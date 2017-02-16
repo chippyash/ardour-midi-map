@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.1">
+  <xs:annotation>
+    <xs:documentation>
+      This schema is for validating the Ardour DAW midi mapping XML files that are distributed with the
+      application.  It can also be used by users to validate their own midi mapping files.
+      
+      Author: Ashley Kitson
+      License: See Ardour licensing
+      
+      Amendments: Please provide documented Pull Request
+      Location: 
+    </xs:documentation>
+  </xs:annotation>
+  <xs:element name="ArdourMIDIBindings">
+    <xs:annotation>
+      <xs:documentation>
+        Root element for anArdour Midi Map.
+        See http://manual.ardour.org/using-control-surfaces/generic-midi/midi-binding-maps/
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="DeviceInfo" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="Binding" maxOccurs="unbounded" type="BaseBinding">
+          <xs:annotation>
+            <xs:documentation>
+              Specify one of channel, sysex or msg attributes
+            </xs:documentation>
+          </xs:annotation>
+          <xs:alternative test="@channel" type="ChannelBinding"/>
+          <xs:alternative test="@sysex" type="NonChannelBinding"/>
+          <xs:alternative test="@msg" type="NonChannelBinding"/>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Name of the control surface
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="version" use="required" type="xs:NMTOKEN">
+        <xs:annotation>
+          <xs:documentation>
+            Version of this file. Use SEMVER versioning e.g. 1.0.0
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="DeviceInfo">
+    <xs:annotation>
+      <xs:documentation>
+        Optional Device information element. Typically used to set up banked controls
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="bank-size" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>
+            Typically, the number of faders on the control surface
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="motorized" use="optional" type="yesNo">
+        <xs:annotation>
+          <xs:documentation>
+            Undocumented! But believed to tell Ardour that the control surface has motorized controls
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="threshold" use="optional" type="xs:int">
+        <xs:annotation>
+          <xs:documentation>
+            Undocumented!
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="BaseBinding">
+    <xs:attribute name="channel" use="optional" type="channelNumber">
+      <xs:annotation>
+        <xs:documentation>
+          Signifies that a standard Continous Controller binding will follow.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sysex" use="optional" type="hexList">
+      <xs:annotation>
+        <xs:documentation>
+          Signifies that a System Executable binding will follow
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="msg" use="optional" type="hexList">
+      <xs:annotation>
+        <xs:documentation>
+          Signifies that a Generic Message binding will follow
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:assert test="(@channel and not(@sysex) and not(@msg)) 
+      or (@sysex and not(@channel) and not(@msg)) 
+      or (@msg and not(@channel) and not(@sysex))"
+    >
+      <xs:annotation>
+        <xs:documentation>
+          Only one of channel, sysex or msg attribute is allowed
+        </xs:documentation>
+      </xs:annotation>
+    </xs:assert>
+  </xs:complexType>
+  
+  <xs:complexType name="ChannelBinding">
+    <xs:annotation>
+      <xs:documentation>
+        A channel binding uses one of ctl, pgm, note, enc-r, enc-b, enc-l, enc-2, rpn, nrpn,
+        rpn-delta or nrpn-delta attributes after the channel attribute, followed by 
+        a function, action or uri attribute
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="BaseBinding">
+        <xs:attribute name="ctl" type="halfByte" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Continous Controller message : Controller id
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pgm" type="halfByte" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Program Change message: Program id 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="note" type="halfByte" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Note On Message: Note id
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pb" type="xs:integer">
+          <xs:annotation>
+            <xs:documentation>
+            Pitch Bend Message: ? id
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="enc-r" type="xs:byte" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Encoder Continous Controller Message, Relative Signed Bit format : value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="enc-b" type="xs:unsignedByte" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Encoder Continous Controller Message, Relative Binary Offset format : value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="enc-l" type="xs:byte" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Encoder Continous Controller Message, Relative Signed Bit 2 format : value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="enc-2" type="xs:unsignedByte" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Encoder Continous Controller Message, Relative 2s Complement format : value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="rpn" type="xs:unsignedShort" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Encoder Continous Controller Message, Multi event midi string RPN format : value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="nrpn" type="xs:unsignedShort" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Encoder Continous Controller Message, Multi event midi string NRPN format : value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="rpn-delta" type="xs:unsignedShort" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Encoder Continous Controller Message, Multi event midi string RPN-DELTA format : value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="nrpn-delta" type="xs:unsignedShort" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Encoder Continous Controller Message, Multi event midi string NRPN-DELTA format : value
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="function" type="functionNames" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Program function name
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="action" type="actionNames" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Program action name
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="uri" type="uriNames" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Control address uri string
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="momentary" type="yesNo" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Solo and mute momentary flag for Note On CCs
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="argument" type="xs:int" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Additional argument attribute for functions
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:assert 
+          test="(@ctl and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-b) and not(@enc-l) and not(@enc-2) and not(@pb) and not(@rpn) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta)) 
+          or (@pgm and not(@ctl) and not(@note) and not(@enc-r) and not(@enc-b) and not(@enc-l) and not(@enc-2) and not(@pb) and not(@rpn) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta)) 
+          or (@note and not(@ctl) and not(@pgm) and not(@enc-r) and not(@enc-b) and not(@enc-l) and not(@enc-2) and not(@pb) and not(@rpn) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta))
+          or (@enc-r and not(@ctl) and not(@pgm) and not(@note) and not(@enc-b) and not(@enc-l) and not(@enc-2) and not(@pb) and not(@rpn) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta))
+          or (@enc-b and not(@ctl) and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-l) and not(@enc-2) and not(@pb) and not(@rpn) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta))
+          or (@enc-l and not(@ctl) and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-b) and not(@enc-2) and not(@pb) and not(@rpn) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta))
+          or (@enc-2 and not(@ctl) and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-l) and not(@enc-b) and not(@pb) and not(@rpn) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta))
+          or (@pb and not(@ctl) and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-l) and not(@enc-b) and not(@enc-2) and not(@rpn) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta))
+          or (@rpn and not(@ctl) and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-l) and not(@enc-b) and not(@enc-2) and not(@pb) and not(@nrpn) and not(@rpn-delta) and not(@nrpn-delta))
+          or (@nrpn and not(@ctl) and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-l) and not(@enc-b) and not(@enc-2) and not(@pb) and not(@rpn) and not(@rpn-delta) and not(@nrpn-delta))
+          or (@rpn-delta and not(@ctl) and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-l) and not(@enc-b) and not(@enc-2) and not(@pb) and not(@rpn) and not(@nrpn) and not(@nrpn-delta))
+          or (@nrpn-delta and not(@ctl) and not(@pgm) and not(@note) and not(@enc-r) and not(@enc-l) and not(@enc-b) and not(@enc-2) and not(@pb) and not(@rpn) and not(@nrpn) and not(@rpn-delta))"
+          >
+          <xs:annotation>
+            <xs:documentation>
+              Assert that a channel attribute is followed by only one of
+              ctrl, pgm, note, pb, enc-b, enc-l, enc-r, enc-2, rpn, nrpn, rpn-delta, nrpn-delta
+            </xs:documentation>
+          </xs:annotation>
+        </xs:assert>
+        <xs:assert test="(@momentary and @note) or not(@momentary)">
+          <xs:annotation>
+            <xs:documentation>
+              Assert that if the momentary attribute is set, then the note attribute is also set 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:assert>
+        <xs:assert test="(@function and not(@action) and not(@uri)) 
+          or (@action and not(@function) and not(@uri)) 
+          or (@uri and not(@function) and not(@action))"
+        >
+          <xs:annotation>
+            <xs:documentation>
+              Assert that Channel commands map to only one of function, action or uri  
+            </xs:documentation>
+          </xs:annotation>
+        </xs:assert>
+        <xs:assert test="(@argument and @function) or not(@argument)">
+          <xs:annotation>
+            <xs:documentation>
+              Assert that if the argument attribute is set, then the function attribute is also set 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:assert>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="NonChannelBinding">
+    <xs:annotation>
+      <xs:documentation>
+        A NonChannelBinding will have sysex or msg attribute as its start attribute and is followed
+        by a function or action attribute. The uri attribute is invalid for this type of binding
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="BaseBinding">
+        <xs:attribute name="function" type="functionNames" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Program function name
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="action" type="actionNames" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Program action name
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="argument" type="xs:int" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Additional argument attribute for functions
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:assert test="(@function and not(@action)) or (@action and not(@function))">
+          <xs:annotation>
+            <xs:documentation>
+              Only one of function or action is allowed
+            </xs:documentation>
+          </xs:annotation>
+        </xs:assert>
+        <xs:assert test="(@function or @action) and (@ctl or @note or @pgm or @sysex or @msg)">
+          <xs:annotation>
+            <xs:documentation>
+              Non channel binding only available for ctl, note, pgm, sysex or msg command attribute types
+            </xs:documentation>
+          </xs:annotation>
+        </xs:assert>
+        <xs:assert test="(@argument and @function) or not(@argument)">
+          <xs:annotation>
+            <xs:documentation>
+              Assert that if the argument attribute is set, then the function attribute is also set 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:assert>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="channelNumber">
+    <xs:annotation>
+      <xs:documentation>
+        Channel numbers are in the range 1 - 16,  However Ardour reduces to zero base
+        if channel > 0 so zero is also allowed 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="16"/>
+    </xs:restriction>
+   </xs:simpleType>
+  
+  <xs:simpleType name="hexList">
+    <xs:annotation>
+      <xs:documentation>
+        Used for msg and sysex attribute formats, a repeatable sequence of 1 or 2 hex digits with space separators
+      </xs:documentation>
+    </xs:annotation>
+    <xs:list itemType="shortHex"/>
+  </xs:simpleType>
+  
+  <xs:simpleType name="shortHex">
+    <xs:annotation>
+      <xs:documentation>
+        1 or 2 digit hex number
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9a-fA-F]{1,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="halfByte">
+    <xs:annotation>
+      <xs:documentation>
+        0 - 127
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:byte">
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="yesNo">
+    <xs:annotation>
+      <xs:documentation>
+        1, 0, 'y', 'Y', 'yes', 'n', 'N' or 'no'
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="1|y|Y|yes|0|n|N|no"></xs:pattern>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="functionNames">
+    <xs:annotation>
+      <xs:documentation>
+        Valid function names. See libs/surfaces/generic_midi/midifunction.cc for canonical list
+        as Ardour docs are incomplete
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="transport-stop"/>
+      <xs:enumeration value="transport-roll"/>
+<!--    Transport-Zero not yet implemented in code as of 5.6  
+        <xs:enumeration value="transport-zero"/>-->
+      <xs:enumeration value="transport-start"/>
+      <xs:enumeration value="transport-end"/>
+      <xs:enumeration value="loop-toggle"/>
+      <xs:enumeration value="toggle-rec-enable"/>
+      <xs:enumeration value="rec-enable"/>
+      <xs:enumeration value="rec-disable"/>
+      <xs:enumeration value="next-bank"/>
+      <xs:enumeration value="prev-bank"/>
+      <xs:enumeration value="set-bank"/>
+      <xs:enumeration value="select"/>
+      <xs:enumeration value="track-set-solo"/>
+      <xs:enumeration value="track-set-solo"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="uriNames">
+    <xs:annotation>
+      <xs:documentation>
+        Control addresses to be used with uri continous controller bindings
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(/(route|bus)/((send/gain|gain)|trim|solo|recenable|mute|panwidth|pandirection)) {1,}(((B|S)?\d\d? {1,}\d?)|\w*)"/>
+      <!--      
+      <xs:enumeration value="/route/plugin/parameter"/>
+      <xs:enumeration value="/route/send/gain"/>
+      <xs:enumeration value=""/>
+      <xs:enumeration value=""/>
+-->    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="actionNames">
+    <xs:annotation>
+      <xs:documentation>
+        The list of action names that you can use is maintained at http://manual.ardour.org/appendix/menu-actions-list/
+        or by running Ardour with the -b flag.  It is too big to maintain manually in this schema unless we can come
+        up with a way to automate its inclusion during the build process.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+    
+  </xs:simpleType>
+</xs:schema>

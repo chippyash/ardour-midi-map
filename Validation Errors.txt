@@ -1,0 +1,39 @@
+bcf2000.map:
+Description: Attribute @motorised is not allowed on element <DeviceInfo>
+Start location: 8:48
+'motorised' attribute is not defined or used within processing.  This is a typo
+and should be 'motorized'. ardour/libs/surfaces/generic_midi/generic_midi_control_protocol.cc L777
+
+bcf2000_mackie.map: 
+Description: Attribute @motorised is not allowed on element <DeviceInfo>
+Start location: 7:44
+'motorised' attribute is not defined or used within processing.  This is a typo
+and should be 'motorized'. ardour/libs/surfaces/generic_midi/generic_midi_control_protocol.cc L777
+
+M-Audio_Axiom61.map:
+Description: The content model for element <ArdourMIDIBindings> does not allow character content
+Start location: 32:44
+This is because there is a '"' character at the end of line 30
+
+M-Audio_Oxygen49.map
+Description: The content model for element <ArdourMIDIBindings> does not allow character content
+Start location: 48:22
+This is because there is a '"' character at the end of line 46
+
+Novation_Impulse61.map
+Description: The content model for element <ArdourMIDIBindings> does not allow character content
+Start location: 56:22
+This is because there is a '"' character at the end of line 53
+
+Novation_LaunchControl_XL.map
+Description: Attribute @motorised is not allowed on element <DeviceInfo>
+Start location: 5:44
+'motorised' attribute is not defined or used within processing.  This is a typo
+and should be 'motorized'. ardour/libs/surfaces/generic_midi/generic_midi_control_protocol.cc L777
+
+Roland_SI-24.map
+Description: The content model for element <ArdourMIDIBindings> does not allow character content
+Start location: 92:55
+Description: The content model for element <ArdourMIDIBindings> does not allow character content
+Start location: 94:60
+Uncommented text at L91 & L92
