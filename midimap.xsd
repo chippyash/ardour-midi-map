@@ -9,7 +9,7 @@
       License: See Ardour licensing
       
       Amendments: Please provide documented Pull Request
-      Location: 
+      Location: https://github.com/chippyash/ardour-midi-map
     </xs:documentation>
   </xs:annotation>
   <xs:element name="ArdourMIDIBindings">
@@ -437,7 +437,7 @@
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value="(/(route|bus)/((send/gain|gain)|trim|solo|recenable|mute|panwidth|pandirection)) {1,}(((B|S)?\d\d? {1,}\d?)|\w*)"/>
+      <xs:pattern value="(/(route|bus)/((send/gain|gain)|trim|solo|recenable|mute|panwidth|pandirection|plugin/parameter)) {1,}(((B|S)?\d\d?( {1,}\d+)+|\w*))"/>
       <!--      
       <xs:enumeration value="/route/plugin/parameter"/>
       <xs:enumeration value="/route/send/gain"/>

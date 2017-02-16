@@ -1,3 +1,5 @@
+Ardour V 4.
+
 bcf2000.map:
 Description: Attribute @motorised is not allowed on element <DeviceInfo>
 Start location: 8:48
@@ -37,3 +39,7 @@ Start location: 92:55
 Description: The content model for element <ArdourMIDIBindings> does not allow character content
 Start location: 94:60
 Uncommented text at L91 & L92
+
+
+Ardour V 5.
+
